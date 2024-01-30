@@ -36,6 +36,7 @@ from ecoords import ECoord
 from convex_hull import hull2D
 from embedded_images import K40_Whisperer_Images
 from ScanOffset import ScanOffset
+from auto_update import UpdateSoftware
 
 import inkex
 import simplestyle
@@ -6174,6 +6175,8 @@ class pxpiDialog(tkSimpleDialog.Dialog):
 #                          Startup Application                                 #
 ################################################################################
 
+UpdateSoftware() #check for updates and update if needed
+
 root = Tk()
 app = Application(root)
 app.master.title(title_text)
@@ -6229,7 +6232,6 @@ if not Icon_Set:
     except:
         pass
 #####################################################################################
-
 
 if LOAD_MSG != "":
     message_box("K40 Whisperer", LOAD_MSG)
