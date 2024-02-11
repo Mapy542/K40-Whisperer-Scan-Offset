@@ -466,11 +466,12 @@ class Application(Frame):
 
         self.scan_offset = ScanOffset()  # setup scan offset object
         self.offsets_path = self.HOME_DIR + "/k40_whisperer_offsets.txt"
-        try:  # try to load offsets from file
-            self.scan_offset.loadOffsets(self.offsets_path)
-        except:  # if file doesn't exist, create it
+        if not self.scan_offset.loadOffsets(self.offsets_path):
+            print("No offset file found, creating new one.")
+            print(self.HOME_DIR)
             self.scan_offset = ScanOffset()
             self.scan_offset.saveOffsets(self.offsets_path)
+        print(self.scan_offset.offsets)
 
         ##########################################################################
         ###                     END INITILIZING VARIABLES                      ###
@@ -2255,7 +2256,7 @@ class Application(Frame):
                 LENGTH = 0
                 n_scanlines = 0
 
-                # my_hull = hull2D()
+                my_hull = hull2D()
                 bignumber = 9999999
                 Raster_step = int(self.get_raster_step_1000in())
                 timestamp = 0
@@ -2265,6 +2266,7 @@ class Application(Frame):
                 SCAN_OFFSET = float(
                     self.scan_offset.getOffset(int(self.Reng_feed.get()))
                 )  # get the scan offset for the current feed rate
+                print("SCAN_OFFSET", SCAN_OFFSET)
 
                 for i_step in range(0, im_height_mils, Raster_step):
                     stepIndex += 1  # track the line count
@@ -2309,14 +2311,12 @@ class Application(Frame):
 
                     y = (im_height_mils - i_step) / 1000.0
                     x = 0
-                    # if LEFT != bignumber:
-                    #    hcoords.append([LEFT / self.input_dpi, y])
-                    # if RIGHT != -bignumber:
-                    #    hcoords.append([RIGHT / self.input_dpi, y])
-                    # if hcoords != []:
-                    #    hcoords = my_hull.convexHullecoords(hcoords)
-                    hcoords.append([LEFT / self.input_dpi, y])  # fill with useless data
-                    # is not used anywhere
+                    if LEFT != bignumber:
+                        hcoords.append([LEFT / self.input_dpi, y])
+                    if RIGHT != -bignumber:
+                        hcoords.append([RIGHT / self.input_dpi, y])
+                    if hcoords != []:
+                        hcoords = my_hull.convexHullecoords(hcoords)
 
                     rng = list(range(0, len(line), 1))
 
@@ -6175,7 +6175,7 @@ class pxpiDialog(tkSimpleDialog.Dialog):
 #                          Startup Application                                 #
 ################################################################################
 
-UpdateSoftware() #check for updates and update if needed
+UpdateSoftware()  # check for updates and update if needed
 
 root = Tk()
 app = Application(root)
