@@ -126,12 +126,17 @@ class ScanOffset:
         Args:
             path (str): The path to load the file from.
         """
-        with open(path, "r") as f:
-            self.offsets = []
-            for line in f:
-                line = line.strip()
-                if line == "":
-                    continue
-                offset = line.split(",")
-                self.offsets.append([int(offset[0]), int(offset[1])])
-            self.sortOffsets()
+        try:
+            with open(path, "r") as f:
+                self.offsets = []
+                for line in f:
+                    line = line.strip()
+                    if line == "":
+                        continue
+                    offset = line.split(",")
+                    self.offsets.append([int(offset[0].strip()), float(offset[1].strip()) * 1])
+                self.sortOffsets()
+                return True
+
+        except:
+            return False
