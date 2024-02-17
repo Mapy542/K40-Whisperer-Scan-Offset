@@ -2226,6 +2226,14 @@ class Application(Frame):
                     nh = int(him * Yscale)
                     image_temp = image_temp.resize((nw, nh))
 
+                # CUSTOM SCAN OFFSET SCALE
+                if self.scan_offset.getCustomRasterScale() != 1.0:
+                    print("Custom Raster Scale: ", self.scan_offset.getCustomRasterScale())
+                    wim, him = image_temp.size  # get the current size
+                    nw = int(wim * self.scan_offset.getCustomRasterScale())  # scale the width
+                    nh = him  # keep the height the same
+                    image_temp = image_temp.resize((nw, nh))  # resize the image
+
                 if self.halftone.get():
                     ht_size_mils = round(self.input_dpi / float(self.ht_size.get()), 1)
                     npixels = int(round(ht_size_mils, 1))

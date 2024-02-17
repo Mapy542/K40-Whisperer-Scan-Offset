@@ -12,7 +12,7 @@
 
 
 class ScanOffset:
-    def __init__(self, offsets=[[100, 0], [400, 0]], allowApproximation=True):
+    def __init__(self, offsets=[[100, 0], [400, 0]], allowApproximation=True, rasterScale=1.0):
         """Create a new ScanOffset object.
 
         Args:
@@ -21,6 +21,7 @@ class ScanOffset:
         """
         self.offsets = offsets
         self.allowApproximation = allowApproximation
+        self.rasterScale = rasterScale
         self.sortOffsets()
 
     def sortOffsets(self):
@@ -101,6 +102,14 @@ class ScanOffset:
                 return
         raise Exception("No offset found for speed " + str(speed) + ".")
 
+    def getCustomRasterScale(self):
+        """Get the custom raster scale.
+
+        Returns:
+            float: The custom raster scale. (Multiplier for the raster img size)
+        """
+        return float(self.rasterScale)
+
     def setOffsets(self, offsets):
         """Set the offset table.
 
@@ -117,6 +126,8 @@ class ScanOffset:
             path (str): The path to save the file to.
         """
         with open(path, "w") as f:
+            f.write("!rasterScale=1.0\n")
+            f.write("# Speed, Offset\n")
             for offset in self.offsets:
                 f.write(str(offset[0]) + "," + str(offset[1]) + "\n")
 
@@ -133,6 +144,17 @@ class ScanOffset:
                     line = line.strip()
                     if line == "":
                         continue
+                    if line[0] == "#":
+                        continue
+                    if line[0] == "!":
+                        if line.split("=")[0] == "!rasterScale":
+                            self.rasterScale = float(line.split("=")[1].strip())
+                            print("Raster scale: " + str(self.rasterScale))
+                            print(self.getCustomRasterScale())
+                            continue
+                        else:
+                            print("Unknown tag: " + line.split("=")[0])
+                            continue
                     offset = line.split(",")
                     self.offsets.append([int(offset[0].strip()), float(offset[1].strip()) * 1])
                 self.sortOffsets()
